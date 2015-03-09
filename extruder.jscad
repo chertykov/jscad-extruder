@@ -283,7 +283,7 @@ function main (params)
     case 'report':
         var shaft_m3_len = base.shaft_base_h + shaft.h - Size.m3.head_h;
         // Text report.
-        res.push (text3d ("Shaft screw length: "+ shaft_m3_len + " + 4mm mount hole depth: "
+        res.push (text3d ("Shaft screw length: "+ shaft_m3_len + " + 4mm mount hole depth => "
                           + (shaft_m3_len + 4))
                   .translate ([0, 10, 0]));
         res.push (text3d ("Idler screw length: 8mm")
