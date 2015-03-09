@@ -73,7 +73,7 @@ var custom_gear = {
 };
 
 var spring = {
-    od: 6.1,                    // Outer diametr
+    od: 6.0,                    // Outer diametr
     id: 4.2,                    // Inner diametr
     l: 15.0,                    // Length
     work_l: 11                  // Compressed length. Working length.
@@ -275,6 +275,8 @@ function main (params)
                   .translate ([0, 5, 0]));
         res.push (text3d ("Mount screw length: 6mm")
                   .translate ([0, 0, 0]));
+        res.push (text3d ("Spring D: " + spring.od + "mm, length: " + spring.l + "mm")
+                  .translate ([0, -5, 0]));
         break;
 
     case "assembly":
