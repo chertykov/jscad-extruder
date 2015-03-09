@@ -156,6 +156,18 @@ function getParameterDefinitions()
             initial: 1.75
         },
         {
+            name: 'spring_length',
+            type: 'float',
+            caption: 'Spring compressed length: ',
+            initial: 11
+        },
+        {
+            name: 'spring_od',
+            type: 'float',
+            caption: 'Spring diameter: ',
+            initial: 6
+        },
+        {
             name: 'axial_clr',
             type: 'float',
             caption: 'Axial clearance (shaft-lever): ',
@@ -233,7 +245,10 @@ function main (params)
     var res;
 
     global = params;
-    
+
+    spring.work_l = params.spring_length;
+    spring.od = params.spring_od;
+
     switch (params.drive_gear) {
     case "mk8":
         gear = mk8_gear;
@@ -275,7 +290,7 @@ function main (params)
                   .translate ([0, 5, 0]));
         res.push (text3d ("Mount screw length: 6mm")
                   .translate ([0, 0, 0]));
-        res.push (text3d ("Spring D: " + spring.od + "mm, length: " + spring.l + "mm")
+        res.push (text3d ("Spring D: " + spring.od + "mm, compressed length: " + spring.work_l + "mm")
                   .translate ([0, -5, 0]));
         break;
 
@@ -332,14 +347,8 @@ function Shaft(height)
 
     this.draw = function()
     {
-        var bevel = 0.3;
         // head
-        var head = union (cylinder ({d: this.head_od, h: this.head_h - bevel, fn: global.fn}),
-                          cylinder ({d1: this.head_od,
-                                     d2: this.head_od - bevel * 2,
-                                     h: bevel,
-                                     fn: global.fn})
-                          .translate ([0, 0, this.head_h - bevel]));
+        var head = cylinder ({d: this.head_od, h: this.head_h, fn: global.fn});
         var shaft = head.union (cylinder ({d: this.od, h: this.h, fn: global.fn}));
         // hole
         var hole = cylinder ({r: Size.m3.r, h: this.h + 1, fn: 8});
@@ -409,6 +418,12 @@ function Lever ()
         // head
         res = res.subtract (cylinder ({d: shaft.head_od + this.clr,
                                        h: shaft.head_h + 1,
+                                       fn: global.fn})
+                            .translate ([-nema.mount_dist, nema.mount_dist, this.h - shaft.head_h]));
+        // No bevel on shaft, so make it here. ;)
+        res = res.subtract (cylinder ({d1: shaft.head_od + this.clr * 3,
+                                       d2: shaft.head_od + this.clr,
+                                       h: this.clr * 2,
                                        fn: global.fn})
                             .translate ([-nema.mount_dist, nema.mount_dist, this.h - shaft.head_h]));
         // shaft
@@ -564,7 +579,7 @@ function Base(hob_h)
                           hole.translate ([nema.mount_dist, nema.mount_dist, -1]),
                           hole.translate ([-nema.mount_dist, nema.mount_dist, -1]));
         // Screw head housings.
-        var head_house = (cylinder ({r: Size.m3.head_r, h: this.base_h, fn: global.fn})
+        var head_house = (cylinder ({r: Size.m3.head_r, h: this.shaft_base_h, fn: global.fn})
                           .translate ([0, nema.mount_dist, this.base_h - Size.m3.head_h]));
         res = res.subtract (head_house.translate ([nema.mount_dist, 0, 0]));
 
